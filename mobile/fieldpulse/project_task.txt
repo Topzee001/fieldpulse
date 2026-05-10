@@ -1,0 +1,238 @@
+## Project: FieldPulse - Mobile Job Management for Field Technicians
+
+Build a mobile application for field service technicians (think: repair technicians, inspectors, delivery drivers) to receive job assignments, navigate to locations, complete checklists, capture photos, collect signatures, and sync everything when connectivity is available.
+
+This type of application is extremely common in enterprise mobile development and tests the practical skills needed for production Flutter & Django work.
+
+---
+
+## Core Requirements
+
+### 1. Authentication
+
+- Email/password login with JWT authentication
+- Refresh token rotation (access token: 15min, refresh token: 7 days)
+- Biometric unlock option (Face ID / Fingerprint) for returning users
+- Proper secure token storage (Keychain/Keystore)
+- Session expiration handling with graceful re-auth flow
+
+### 2. Job List & Management
+
+**Job List Screen:**
+
+- Display assigned jobs with status indicators (Pending, In Progress, Completed)
+- Pull-to-refresh
+- Filter by status, date range
+- Search by customer name, address, or job ID
+- Jobs sorted by scheduled time, with "overdue" jobs highlighted
+- Pagination or infinite scroll (API should support cursor-based pagination)
+
+**Job Detail Screen:**
+
+- Customer information (name, phone — tappable to call, address — tappable to open in maps)
+- Job description and notes
+- Scheduled time window
+- Status with ability to update (Pending → In Progress → Completed)
+- Navigation button to launch turn-by-turn directions
+
+**Performance requirement:** List must maintain 60fps scroll with 500+ jobs loaded. Demonstrate with profiling evidence.
+
+### 3. Job Checklist System
+
+Each job has a dynamic checklist defined by the backend. Support these field types:
+
+| Field Type | Requirements |
+| --- | --- |
+| Text | Single line input with optional validation (email, phone, number) |
+| Text Area | Multi-line with character limit |
+| Number | Numeric keyboard, optional min/max validation |
+| Select | Single selection from options |
+| Multi-Select | Multiple selection with chips display |
+| Date/Time | Native date and time pickers |
+| Photo | Capture from camera (not gallery). See Photo section. |
+| Signature | Signature capture pad. See Signature section. |
+| Checkbox | Simple boolean |
+
+**Requirements:**
+
+- Validation must run on blur and on submit attempt
+- Invalid fields must scroll into view with clear error messaging
+- Form state must persist if user backgrounds app or navigates away
+- "Save Draft" functionality — incomplete checklists can be saved locally
+- Form schema is defined by backend (you design the schema format)
+
+### 4. Photo Capture
+
+- Capture photos directly from camera (gallery selection not required)
+- Automatic EXIF orientation correction
+- Compress images to max 1200px longest edge, ~80% quality JPEG
+- Display thumbnail preview after capture with option to retake
+- Support multiple photos per photo field (configurable max in schema)
+- Photos must include:
+    - Timestamp overlay (burned into image, not just metadata)
+    - GPS coordinates stored in metadata (if permission granted)
+- Queue photos for upload — don't block form submission on upload completion
+- Show upload progress indicator per photo
+
+### 5. Signature Capture
+
+- Full-screen signature pad (landscape orientation recommended)
+- Smooth drawing at 60fps with reasonable stroke rendering
+- Clear button
+- Confirm button that captures signature as PNG
+- Signature must be captured at reasonable resolution (not tiny)
+- Stored locally until job sync
+
+### 6. Maps & Navigation
+
+- Display job location on map in detail view
+- "Navigate" button launches native maps app (Apple Maps / Google Maps) with destination
+- Job list should show distance from current location (if permission granted)
+- Handle location permission denial gracefully with clear messaging
+
+**Note:** You do not need to build turn-by-turn navigation — launching the native maps app is sufficient.
+
+### 7. Offline Support
+
+**This is critical. Field technicians often have poor connectivity.**
+
+- Full job list must be available offline (synced on login and pull-to-refresh)
+- Job details and checklist schema must be cached
+- Checklist responses saved locally immediately on change
+- Completed jobs queued for sync when online
+- Photos queued for upload with retry logic
+
+**Sync behavior:**
+
+- Visual indicator of pending sync items (e.g., "3 jobs pending upload")
+- Manual "Sync Now" option
+- Automatic sync when connectivity restored
+- Conflict handling: If job was modified on server while offline, show conflict UI and let user choose (keep local / accept server / merge manually for text fields)
+
+**Offline storage:**
+
+- Use SQLite or similar (not just AsyncStorage for large data)
+- Photos stored in filesystem with database references
+
+### 8. Push Notifications
+
+- Receive notifications for new job assignments
+- Notification tap deep-links to the specific job
+- Handle notification when app is in foreground (show in-app alert, don't rely on system notification)
+
+### 9. Backend
+
+Build a backend service with:
+
+- **Language:** TypeScript - use the backend framework you’re most comfortable with
+- **Database:** PostgreSQL
+- **File Storage:** S3-compatible (use MinIO for local dev)
+
+**Requirements:**
+
+- Input validation on all endpoints
+- Proper error responses with consistent format
+- Authentication middleware
+- Basic rate limiting
+- Database migrations included
+- Seed script that generates 100+ sample jobs with realistic data
+
+---
+
+## Technical Requirements
+
+### Must Use
+
+- Flutter on the frontend
+- Django on the backend
+
+### Must Not Use
+
+- Any complete "job management" or "field service" template/starter
+- UI component libraries for core interactions (build your own form fields, signature pad). Basic primitives (buttons, icons) from libraries are fine.
+- Firebase for offline sync or database (build your own)
+
+### Platform Support
+
+- iOS 14+
+- Android 10+ (API 29+)
+- Must test on both platforms (simulators acceptable for submission, but you must demonstrate both)
+
+---
+
+## Deliverables
+
+### 1. Source Code
+
+- GitHub repository with clear structure
+- Flutter app
+- Backend service
+- Docker Compose for local backend + database + MinIO
+- Database migrations and seed script
+- Environment example file with documentation
+
+### 2. Documentation
+
+[**README.md](http://readme.md/):**
+
+- How to run the project (must work on fresh machine with Docker)
+- How to run tests
+- Any known limitations or incomplete features
+
+[**DECISIONS.md](http://decisions.md/):**
+
+- Why you chose your state management approach
+- How you structured offline sync and conflict resolution
+- Any significant architectural decisions and trade-offs
+- What you'd do differently with more time
+
+### 3. Testing
+
+- Unit tests for:
+    - Form validation logic
+    - Offline queue logic
+    - Any complex business logic
+- Integration tests for:
+    - At least 3 critical API flows
+- E2E test (Detox or similar):
+    - Login → View job → Complete checklist → Submit flow
+
+Aim for meaningful coverage, not a percentage target. Test the tricky parts.
+
+### 4. Brief Video (5-8 minutes)
+
+Screen recording demonstrating:
+
+- App running on iOS and Android
+- Complete flow: Login → View jobs → Start job → Fill checklist → Capture photo → Capture signature → Complete job
+- Offline behavior: Turn on airplane mode → Make changes → Restore connectivity → Show sync
+- Brief code walkthrough of one area you're proud of
+
+---
+
+## Evaluation Criteria
+
+| Category | Weight | What We're Looking For |
+| --- | --- | --- |
+| **Functionality** | 30% | Core flows work correctly. Edge cases handled. Nothing crashes. |
+| **Code Quality** | 25% | Clean architecture, consistent patterns, proper typing, readable code. |
+| **UX Polish** | 15% | Loading states, error handling, keyboard behavior, form UX, platform-appropriate design. |
+| **Offline & Sync** | 15% | Reliable offline behavior, sensible conflict handling, no data loss. |
+| **Performance** | 10% | Smooth scrolling, responsive UI, reasonable memory usage. |
+| **Documentation & Testing** | 5% | Clear docs, meaningful tests, honest about limitations. |
+
+---
+
+## What We're NOT Evaluating
+
+- Visual design / aesthetics (functional UI is fine, it doesn't need to be beautiful)
+- Perfect feature completeness (a well-executed 80% beats a buggy 100%)
+- Obscure optimizations (don't prematurely optimize, but don't be negligent)
+
+---
+
+## Submission
+
+1. GitHub repository link (invite evaluator as collaborator if private)
+2. Video link (Loom, unlisted YouTube, or similar)
+3. Brief note on total hours spent and any areas you'd improve with more time
