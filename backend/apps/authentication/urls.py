@@ -6,7 +6,6 @@ from .views import (
 )
 
 urlpatterns = [
-    # Add your URL patterns here
     path('login/', CustomTokenObtainPairView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
     path('refresh/', CustomTokenRefreshView.as_view(), name='refresh'),

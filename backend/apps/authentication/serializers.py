@@ -41,7 +41,6 @@ class LoginSerializer(serializers.Serializer):
         if not user.is_active:
             raise serializers.ValidationError({'email': 'Account is disabled'})
         
-        # Update device info
         if attrs.get('device_id'):
             user.device_id = attrs['device_id']
         if attrs.get('fcm_token'):
@@ -50,7 +49,6 @@ class LoginSerializer(serializers.Serializer):
         user.last_active = timezone.now()
         user.save(update_fields=['device_id', 'fcm_token', 'last_active'])
         
-        # Generate tokens
         refresh = RefreshToken.for_user(user)
         
         attrs['user'] = user
@@ -72,8 +70,6 @@ class RefreshTokenSerializer(serializers.Serializer):
             attrs['user'] = user
             attrs['access'] = str(refresh.access_token)
             
-            # Rotate refresh token (SimpleJWT does this automatically when ROTATE_REFRESH_TOKENS=True)
-            # We just need to return the new refresh if needed
             if hasattr(refresh, 'blacklist'):
                 refresh.blacklist()
                 new_refresh = RefreshToken.for_user(user)

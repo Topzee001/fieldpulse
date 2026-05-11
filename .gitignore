@@ -1,0 +1,10 @@
+backend/firebase-credentials.json
+backend/media/
+*.log
+.DS_Store
+.vscode/
+__pycache__/
+*.pyc
+mobile/fieldpulse/build/
+mobile/fieldpulse/.dart_tool/
+mobile/fieldpulse/pubspec.lock

@@ -29,4 +29,3 @@ urllib3==1.26.20
 django-filter==25.1
 Faker==20.0
 firebase-admin
-firebase-admin

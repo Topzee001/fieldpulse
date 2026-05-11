@@ -68,5 +68,15 @@
 	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>This app requires Face ID or Touch ID to log you in securely without a password.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>http</string>
+		<string>https</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires access to your location to embed GPS coordinates into the photos you capture for job verification.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires access to your location to embed GPS coordinates into the photos you capture for job verification.</string>
 </dict>
 </plist>

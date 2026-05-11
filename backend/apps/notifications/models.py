@@ -25,7 +25,6 @@ class NotificationLog(models.Model):
     title = models.CharField(max_length=255)
     body = models.TextField()
     
-    # FCM delivery tracking
     fcm_message_id = models.CharField(max_length=255, blank=True)
     sent_at = models.DateTimeField(auto_now_add=True)
     delivered = models.BooleanField(default=False)

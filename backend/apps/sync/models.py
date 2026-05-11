@@ -44,7 +44,6 @@ class SyncQueue(models.Model):
         help_text="When to attempt retry (exponential backoff)"
     )
     
-    # Status tracking
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True, blank=True)
     error_message = models.TextField(blank=True)

@@ -44,7 +44,6 @@ class JobListView(generics.ListCreateAPIView):
     filterset_class = JobFilter
 
     def get_serializer_class(self):
-        # Use simple serializer for listing, detailed serializer for creation/validation
         if self.request.method == 'POST':
             from .serializers import JobDetailSerializer
             return JobDetailSerializer
@@ -61,7 +60,6 @@ class JobListView(generics.ListCreateAPIView):
         """Return jobs assigned to current user, ordered by scheduled time. Admin sees all."""
         queryset = Job.objects.all().select_related('assigned_to')
         
-        # If not an admin/staff, restrict to their own assigned jobs
         if not self.request.user.is_staff:
             queryset = queryset.filter(assigned_to=self.request.user)
             
@@ -69,7 +67,6 @@ class JobListView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         """When admin creates a job, it uses the provided assigned_to field"""
-        # We don't auto-assign to self anymore, we let the admin provide the technician ID in the payload!
         serializer.save()
 
 
@@ -105,15 +102,21 @@ class JobStatusUpdateView(APIView):
         new_status = serializer.validated_data['status']
         old_status = job.status
         
+        if new_status == old_status:
+            return Response({
+                'status': 'no_change',
+                'old_status': old_status,
+                'new_status': new_status,
+                'version': job.version
+            })
+            
         job.status = new_status
         
-        # Track actual start/completion times
         if new_status == Job.Status.IN_PROGRESS and not job.actual_start:
             job.actual_start = timezone.now()
         elif new_status == Job.Status.COMPLETED and not job.actual_completion:
             job.actual_completion = timezone.now()
         
-        # Increment version for conflict detection
         job.version += 1
         job.save()
         
@@ -177,15 +180,12 @@ class JobChecklistView(APIView):
         response = self.get_checklist_response(job, request.user)
         
         if partial:
-            # Merge: update only provided fields
             response.data.update(serializer.validated_data['data'])
         else:
-            # Replace: full overwrite
             response.data = serializer.validated_data['data']
         
         response.is_draft = serializer.validated_data.get('is_draft', True)
         
-        # Validate data against schema if they are submitting the final version
         if not response.is_draft:
             is_valid, validation_errors = validate_checklist_response(
                 response.data, 
@@ -194,13 +194,11 @@ class JobChecklistView(APIView):
             if not is_valid:
                 return Response({'validation_errors': validation_errors}, status=status.HTTP_400_BAD_REQUEST)
         
-        # If not draft, mark as synced
         if not response.is_draft:
             response.synced_at = timezone.now()
         
         response.save()
         
-        # Increment job version for conflict detection
         job.version += 1
         job.save(update_fields=['version'])
         
@@ -228,9 +226,7 @@ class JobSyncView(APIView):
 
         received_version = request.data.get('version', job.version)
 
-        # Conflict detection
         if received_version < job.version:
-            # Fetch current checklist response
             current_data = {}
             try:
                 resp = ChecklistResponse.objects.get(job=job)
@@ -251,7 +247,6 @@ class JobSyncView(APIView):
                 'message': 'Job was modified on server. Please resolve conflict.'
             }, status=status.HTTP_409_CONFLICT)
 
-        # Apply updates
         if 'checklist_data' in request.data:
             response, _ = ChecklistResponse.objects.get_or_create(job=job)
             response.data.update(request.data['checklist_data'])
@@ -259,7 +254,6 @@ class JobSyncView(APIView):
             response.synced_at = timezone.now()
             response.save()
 
-        # Apply status update if present
         if 'status' in request.data:
             new_status = request.data['status']
             if new_status in [Job.Status.IN_PROGRESS, Job.Status.COMPLETED]:
@@ -269,7 +263,6 @@ class JobSyncView(APIView):
                 elif new_status == Job.Status.COMPLETED and not job.actual_completion:
                     job.actual_completion = timezone.now()
 
-        # Increment version
         job.version += 1
         job.save()
 
@@ -298,36 +291,29 @@ class JobPhotoUploadView(APIView):
         if not uploaded_file:
             return Response({'error': 'No photo provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate image
         if not uploaded_file.content_type.startswith('image/'):
             return Response({'error': 'File must be an image'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Compress image
         img = Image.open(uploaded_file)
-        # Fix EXIF orientation
         try:
             img = ImageOps.exif_transpose(img)
         except:
             pass
 
-        # Resize to max 1200px longest edge
         max_size = 1200
         if max(img.size) > max_size:
             ratio = max_size / max(img.size)
             new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
             img = img.resize(new_size, Image.Resampling.LANCZOS)
 
-        # Compress to JPEG 80% quality
         output = io.BytesIO()
         img.convert('RGB').save(output, format='JPEG', quality=80)
         compressed_data = output.getvalue()
 
-        # Generate file name
         ext = '.jpg'
         filename = f"jobs/{job.id}/photos/{datetime.now().timestamp()}{ext}"
         saved_path = default_storage.save(filename, ContentFile(compressed_data))
 
-        # Create photo record
         photo = Photo.objects.create(
             job=job,
             field_id=request.data.get('field_id', 'photo'),
@@ -365,15 +351,12 @@ class JobSignatureUploadView(APIView):
         if not uploaded_file:
             return Response({'error': 'No signature provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate PNG
         if not uploaded_file.content_type == 'image/png':
             return Response({'error': 'Signature must be PNG'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Generate file name
         filename = f"jobs/{job.id}/signature_{datetime.now().timestamp()}.png"
         saved_path = default_storage.save(filename, uploaded_file)
 
-        # Create or update signature
         signature, created = Signature.objects.update_or_create(
             job=job,
             defaults={'signature_url': default_storage.url(saved_path)}

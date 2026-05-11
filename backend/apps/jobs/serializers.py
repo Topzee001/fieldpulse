@@ -76,6 +76,10 @@ class JobStatusUpdateSerializer(serializers.Serializer):
             Job.Status.CANCELLED: [],  # Terminal state
         }
         
+        # Allow same status for idempotency
+        if value == job.status:
+            return value
+            
         if value not in allowed_transitions.get(job.status, []):
             raise serializers.ValidationError(
                 f"Cannot transition from {job.get_status_display()} to {dict(Job.Status.choices).get(value)}"

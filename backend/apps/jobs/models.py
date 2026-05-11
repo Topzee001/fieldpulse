@@ -15,7 +15,6 @@ class Job(models.Model):
         CANCELLED = 'cancelled', 'Cancelled'
         OVERDUE = 'overdue', 'Overdue'  # Virtual status, computed
     
-    # Identifiers
     job_id = models.CharField(
         max_length=50, 
         unique=True, 
@@ -23,7 +22,6 @@ class Job(models.Model):
         help_text="Human-readable job identifier (e.g., JOB-2025-001)"
     )
     
-    # Assignment
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
@@ -31,13 +29,11 @@ class Job(models.Model):
         db_index=True
     )
     
-    # Customer information
     customer_name = models.CharField(max_length=255)
     customer_phone = models.CharField(max_length=20)
     customer_email = models.EmailField(blank=True, null=True)
     customer_address = models.TextField()
     
-    # Geolocation (for maps and distance calculation)
     latitude = models.DecimalField(
         max_digits=9, 
         decimal_places=6,
@@ -49,15 +45,12 @@ class Job(models.Model):
         validators=[MinValueValidator(-180), MaxValueValidator(180)]
     )
     
-    # Job details
     description = models.TextField()
     notes = models.TextField(blank=True, help_text="Internal notes for technician")
     
-    # Scheduling
     scheduled_start = models.DateTimeField(db_index=True)
     scheduled_end = models.DateTimeField()
     
-    # Status tracking
     status = models.CharField(
         max_length=20, 
         choices=Status.choices, 
@@ -67,16 +60,13 @@ class Job(models.Model):
     actual_start = models.DateTimeField(null=True, blank=True)
     actual_completion = models.DateTimeField(null=True, blank=True)
     
-    # Dynamic checklist schema (JSON)
     checklist_schema = models.JSONField(
         default=dict,
         help_text="JSON schema defining the checklist fields for this job type"
     )
     
-    # Optimistic locking for conflict detection
     version = models.IntegerField(default=1)
     
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

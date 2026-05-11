@@ -2,9 +2,11 @@ import 'package:fieldpulse/src/features/auth/views/login_screen.dart';
 import 'package:fieldpulse/src/features/auth/views/register_screen.dart';
 import 'package:fieldpulse/src/features/jobs/views/job_detail_screen.dart';
 import 'package:fieldpulse/src/features/jobs/views/job_list_screen.dart';
+import 'package:fieldpulse/src/services/push_notification_service.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
+  navigatorKey: rootNavigatorKey,
   initialLocation: '/login',
   routes: [
     GoRoute(

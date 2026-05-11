@@ -11,7 +11,6 @@ def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
     
     if response is not None:
-        # Check for token expiration
         if response.status_code == status.HTTP_401_UNAUTHORIZED:
             response.data = {
                 'error': 'authentication_failed',
@@ -19,7 +18,6 @@ def custom_exception_handler(exc, context):
                 'code': 'token_expired' if 'expired' in str(response.data).lower() else 'invalid_token'
             }
         
-        # Format validation errors
         elif response.status_code == status.HTTP_400_BAD_REQUEST:
             if isinstance(response.data, dict):
                 response.data = {

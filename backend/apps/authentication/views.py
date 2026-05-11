@@ -47,6 +47,19 @@ class CustomTokenRefreshView(TokenRefreshView):
     """
     serializer_class = RefreshTokenSerializer
 
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            return Response({"refresh": ["Invalid or expired refresh token"]}, status=status.HTTP_400_BAD_REQUEST)
+            
+        return Response({
+            'access': serializer.validated_data['access'],
+            'refresh': serializer.validated_data['refresh'],
+            'user': UserSerializer(serializer.validated_data['user']).data,
+        }, status=status.HTTP_200_OK)
+
 
 class BiometricLoginView(APIView):
     """Biometric login for returning users"""
@@ -141,7 +154,6 @@ class ProfileView(APIView):
         return Response(serializer.data)
     
     def patch(self, request):
-        # Update profile (first_name, last_name)
         user = request.user
         if 'first_name' in request.data:
             user.first_name = request.data['first_name']

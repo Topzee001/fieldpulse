@@ -1,4 +1,5 @@
 import 'package:fieldpulse/src/app/providers/dio_provider.dart';
+import 'package:fieldpulse/src/app/providers/secure_storage_provider.dart';
 import 'package:fieldpulse/src/features/auth/models/user.dart';
 import 'package:fieldpulse/src/features/auth/repositories/auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

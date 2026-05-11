@@ -5,7 +5,6 @@ from .views import (
 )
 
 urlpatterns = [
-    # Add your URL patterns here
     path('', JobListView.as_view(), name='job-list'),
     path('<int:id>/', JobDetailView.as_view(), name='job-detail'),
     path('<int:id>/status/', JobStatusUpdateView.as_view(), name='job-status'),

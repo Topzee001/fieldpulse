@@ -23,19 +23,15 @@ class User(AbstractUser):
     Uses EMAIL as the unique identifier instead of username.
     """
     
-    # Remove username field
     username = None
     
-    # Email is now the unique identifier
     email = models.EmailField(_('email address'), unique=True)
     
-    # Keep for display purposes (optional)
     first_name = models.CharField(_('first name'), max_length=150)
     last_name = models.CharField(_('last name'), max_length=150)
 
     objects = UserManager()
     
-    # Device identifier for FCM push notifications
     device_id = models.CharField(
         max_length=255, 
         blank=True, 
@@ -43,7 +39,6 @@ class User(AbstractUser):
         help_text="Unique device identifier for targeting push notifications"
     )
     
-    # FCM registration token (changes when app reinstalled)
     fcm_token = models.CharField(
         max_length=255, 
         blank=True, 
@@ -51,23 +46,29 @@ class User(AbstractUser):
         help_text="Firebase Cloud Messaging token for this device"
     )
     
-    # Biometric login preference
     biometric_enabled = models.BooleanField(
         default=False,
         help_text="User can use Face ID / Fingerprint to login"
     )
     
-    # Last active timestamp (for sync optimization)
     last_active = models.DateTimeField(auto_now=True)
     
-    # For refresh token blacklisting
     is_active = models.BooleanField(default=True)
     
-    USERNAME_FIELD = 'email'  # Use email for login
-    REQUIRED_FIELDS = ['first_name', 'last_name']  # Required when creating superuser
+    USERNAME_FIELD = 'email'
+
+    USERNAME_FIELD = 'email'
+
+    REQUIRED_FIELDS = ['first_name', 'last_name']
+
+    REQUIRED_FIELDS = ['first_name', 'last_name']
+
     
     class Meta:
-        db_table = 'users'  # custom DB table name
+        db_table = 'users'
+
+        db_table = 'users'
+
         verbose_name = _('User')
         verbose_name_plural = _('Users')
         indexes = [

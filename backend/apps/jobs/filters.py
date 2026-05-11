@@ -9,11 +9,9 @@ class JobFilter(filters.FilterSet):
     """
     status = filters.ChoiceFilter(choices=Job.Status.choices)
     
-    # Date range filters
     scheduled_from = filters.DateTimeFilter(field_name='scheduled_start', lookup_expr='gte')
     scheduled_to = filters.DateTimeFilter(field_name='scheduled_start', lookup_expr='lte')
     
-    # Search across multiple fields
     search = filters.CharFilter(method='filter_search')
     
     class Meta:
