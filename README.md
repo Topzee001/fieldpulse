@@ -67,6 +67,12 @@ To run integration tests (requires a running emulator or connected device):
 flutter test integration_test/app_test.dart
 ```
 
+## Performance Profiling
+
+The job list maintains 60fps scrolling with 500+ jobs. Below is a profile screenshot from Flutter DevTools showing consistent frame rendering.
+
+![Performance Profile](docs/performance-profile.png)
+
 ## Test Account (seeded automatically)
 
 Email: tech@fieldpulse.com
