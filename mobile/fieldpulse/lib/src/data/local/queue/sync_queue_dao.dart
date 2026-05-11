@@ -43,11 +43,9 @@ class SyncQueueDao {
 
   Future<void> incrementRetry(int id) async {
     final db = await _db;
-    await db.update(
-      'sync_queue',
-      {'retry_count': db.rawUpdate('retry_count + 1')},
-      where: 'id = ?',
-      whereArgs: [id],
+    await db.rawUpdate(
+      'UPDATE sync_queue SET retry_count = retry_count + 1 WHERE id = ?',
+      [id],
     );
   }
 

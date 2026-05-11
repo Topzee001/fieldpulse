@@ -10,11 +10,13 @@ final jobListProvider = StateNotifierProvider<JobListNotifier, JobListState>((
   return repoAsync.when(
     data: (repo) => JobListNotifier(repo)..loadJobs(refresh: true),
     loading: () => JobListNotifier(null),
-    error: (e, __) => JobListNotifier(null)..setError('Failed to initialize: $e'),
+    error: (e, _) => JobListNotifier(null)..setError('Failed to initialize: $e'),
   );
 });
 
 class JobListState {
+  static const Object _unset = Object();
+
   final List<Job> jobs;
   final bool isLoading;
   final bool isLoadingMore;
@@ -37,19 +39,19 @@ class JobListState {
     List<Job>? jobs,
     bool? isLoading,
     bool? isLoadingMore,
-    String? error,
-    String? filterStatus,
-    String? searchQuery,
-    String? nextCursor,
+    Object? error = _unset,
+    Object? filterStatus = _unset,
+    Object? searchQuery = _unset,
+    Object? nextCursor = _unset,
   }) {
     return JobListState(
       jobs: jobs ?? this.jobs,
       isLoading: isLoading ?? this.isLoading,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
-      error: error,
-      filterStatus: filterStatus ?? this.filterStatus,
-      searchQuery: searchQuery ?? this.searchQuery,
-      nextCursor: nextCursor ?? this.nextCursor,
+      error: error == _unset ? this.error : error as String?,
+      filterStatus: filterStatus == _unset ? this.filterStatus : filterStatus as String?,
+      searchQuery: searchQuery == _unset ? this.searchQuery : searchQuery as String?,
+      nextCursor: nextCursor == _unset ? this.nextCursor : nextCursor as String?,
     );
   }
 }
