@@ -25,6 +25,15 @@ The backend runs using Docker. It includes the Django web application, a Postgre
 
 ### Mobile
 
+The Flutter app follows a feature-based MVVM-style architecture using Riverpod for state management and dependency injection.
+
+- Architecture: MVVM-style, where UI screens are the View and `StateNotifier`/`StateNotifierProvider` classes act as ViewModels.
+- State management: `flutter_riverpod` with `ProviderScope` at the app root
+- Networking: `dio` and `retrofit` for API clients
+- Local persistence: `sqflite` for on-device job/queue storage and `flutter_secure_storage` for sensitive data
+- Navigation: `go_router`
+- App structure: `src/app/providers` for app-level providers, `src/features/*` for feature modules, `src/data/remote` and `src/data/local` for data layers, and `src/services` for sync/notification/background services
+
 1. Navigate to the `mobile/fieldpulse` directory:
    ```bash
    cd mobile/fieldpulse

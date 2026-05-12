@@ -1,5 +1,16 @@
 # Architectural Decisions and Trade-offs
 
+## Mobile App Architecture
+
+The Flutter app follows a feature-based MVVM-style architecture with the following structure:
+- `src/app/providers`: app-level Riverpod providers and dependency injection
+- `src/features/*`: feature modules (jobs, checklist, auth, etc.)
+- `src/data/remote` + `src/data/local`: data layer for API clients, repositories, and local persistence
+- `src/services`: background sync, notifications, and platform integration services
+- `go_router` for navigation and `flutter_riverpod` for state management
+
+The UI layers are implemented as Flutter widgets, while `StateNotifier`/`StateNotifierProvider` classes serve as the ViewModel layer, exposing state and actions to the views.
+
 ## State Management Approach
 
 For the Flutter mobile application, I chose **Riverpod** for state management. 
