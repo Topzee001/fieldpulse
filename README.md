@@ -42,10 +42,25 @@ The Flutter app follows a feature-based MVVM-style architecture using Riverpod f
    ```bash
    flutter pub get
    ```
-3. Run the app on a connected device or emulator:
-   ```bash
-   flutter run
-   ```
+3. Run the app on a connected device or emulator.
+
+   This repo no longer includes shared Firebase keys, so you need to use your own local Firebase configuration.
+
+   - If you have local Firebase platform files, just run:
+     ```bash
+     flutter run
+     ```
+   - Otherwise, pass your Firebase values at build time:
+     ```bash
+     flutter run \
+       --dart-define=FIREBASE_ANDROID_API_KEY=your_android_api_key \
+       --dart-define=FIREBASE_ANDROID_APP_ID=your_android_app_id \
+       --dart-define=FIREBASE_IOS_API_KEY=your_ios_api_key \
+       --dart-define=FIREBASE_IOS_APP_ID=your_ios_app_id
+     ```
+     Add the remaining values as needed for your setup.
+
+   Do not commit your local Firebase config files such as `firebase_options.dart`, `android/app/google-services.json`, or `ios/Runner/GoogleService-Info.plist`.
 
 ## How to Run Tests
 
