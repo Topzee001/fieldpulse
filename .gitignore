@@ -8,3 +8,5 @@ __pycache__/
 mobile/fieldpulse/build/
 mobile/fieldpulse/.dart_tool/
 mobile/fieldpulse/pubspec.lock
+mobile/fieldpulse/android/app/google-services.json
+mobile/fieldpulse/ios/Runner/GoogleService-Info.plist

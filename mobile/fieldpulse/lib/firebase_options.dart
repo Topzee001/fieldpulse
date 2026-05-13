@@ -4,22 +4,43 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
+const String _androidApiKey =
+    String.fromEnvironment('FIREBASE_ANDROID_API_KEY', defaultValue: '');
+const String _androidAppId =
+    String.fromEnvironment('FIREBASE_ANDROID_APP_ID', defaultValue: '');
+const String _iosApiKey =
+    String.fromEnvironment('FIREBASE_IOS_API_KEY', defaultValue: '');
+const String _iosAppId =
+    String.fromEnvironment('FIREBASE_IOS_APP_ID', defaultValue: '');
+const String _messagingSenderId =
+    String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID', defaultValue: '');
+const String _projectId =
+    String.fromEnvironment('FIREBASE_PROJECT_ID', defaultValue: '');
+const String _storageBucket =
+    String.fromEnvironment('FIREBASE_STORAGE_BUCKET', defaultValue: '');
+const String _iosBundleId =
+    String.fromEnvironment('FIREBASE_IOS_BUNDLE_ID', defaultValue: '');
+
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
-/// Example:
-/// ```dart
-/// import 'firebase_options.dart';
-/// // ...
-/// await Firebase.initializeApp(
-///   options: DefaultFirebaseOptions.currentPlatform,
-/// );
+/// Provide values through Flutter build/run defines:
+///
+/// ```bash
+/// flutter run --dart-define=FIREBASE_ANDROID_API_KEY=... \
+///   --dart-define=FIREBASE_ANDROID_APP_ID=... \
+///   --dart-define=FIREBASE_IOS_API_KEY=... \
+///   --dart-define=FIREBASE_IOS_APP_ID=... \
+///   --dart-define=FIREBASE_MESSAGING_SENDER_ID=... \
+///   --dart-define=FIREBASE_PROJECT_ID=... \
+///   --dart-define=FIREBASE_STORAGE_BUCKET=... \
+///   --dart-define=FIREBASE_IOS_BUNDLE_ID=... 
 /// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       throw UnsupportedError(
         'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
+        'please add web Firebase configuration separately.',
       );
     }
     switch (defaultTargetPlatform) {
@@ -30,17 +51,16 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+          'please add macOS Firebase configuration separately.',
         );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+          'please add Windows Firebase configuration separately.',
         );
       case TargetPlatform.linux:
         throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+          'DefaultFirebaseOptions are not supported for this platform.',
         );
       default:
         throw UnsupportedError(
@@ -50,19 +70,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDOIKFMT0-eH4F-XMrWAqhwptWa-_s-77Y',
-    appId: '1:1085108621112:android:2c64d35318e8e57690fbcd',
-    messagingSenderId: '1085108621112',
-    projectId: 'fieldpulse-d4b84',
-    storageBucket: 'fieldpulse-d4b84.firebasestorage.app',
+    apiKey: _androidApiKey,
+    appId: _androidAppId,
+    messagingSenderId: _messagingSenderId,
+    projectId: _projectId,
+    storageBucket: _storageBucket,
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCHuqh2H4tL6zB1hLFoKj3cGCRr4jG36Fo',
-    appId: '1:1085108621112:ios:25665f03a6066e0d90fbcd',
-    messagingSenderId: '1085108621112',
-    projectId: 'fieldpulse-d4b84',
-    storageBucket: 'fieldpulse-d4b84.firebasestorage.app',
-    iosBundleId: 'com.prioritysoft.fieldpulse',
+    apiKey: _iosApiKey,
+    appId: _iosAppId,
+    messagingSenderId: _messagingSenderId,
+    projectId: _projectId,
+    storageBucket: _storageBucket,
+    iosBundleId: _iosBundleId,
   );
 }
